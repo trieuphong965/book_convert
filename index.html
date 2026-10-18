@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tạo file .book cho máy đọc sách</title>
+<style>
+  :root { --bg:#f4f4f5; --card:#fff; --ink:#1c1c1e; --sub:#6b7280; --line:#e5e7eb; --accent:#2563eb; --warn:#b45309; --warnbg:#fef3c7; --err:#dc2626; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; }
+  .wrap { max-width:760px; margin:0 auto; padding:20px 16px 64px; }
+  h1 { font-size:22px; margin:8px 0 4px; }
+  .lead { color:var(--sub); font-size:14px; margin:0 0 20px; }
+  .card { background:var(--card); border-radius:12px; padding:18px; margin-bottom:16px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+  .drop { border:2px dashed #cbd5e1; border-radius:12px; padding:36px 16px; text-align:center; color:var(--sub); cursor:pointer; transition:.15s; }
+  .drop.hover { border-color:var(--accent); background:#eff6ff; color:var(--ink); }
+  .drop b { color:var(--ink); }
+  .hint { font-size:12px; color:var(--sub); margin-top:8px; }
+  .book { border:1px solid var(--line); border-radius:10px; padding:14px; margin-top:14px; }
+  .book h3 { margin:0 0 10px; font-size:14px; color:var(--sub); font-weight:600; word-break:break-all; }
+  .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+  .row label { font-size:13px; color:var(--sub); min-width:72px; }
+  input[type=text] { flex:1; min-width:180px; padding:8px 10px; border:1px solid var(--line); border-radius:8px; font-size:15px; }
+  select { padding:8px 10px; border:1px solid var(--line); border-radius:8px; font-size:14px; background:#fff; }
+  .meta { font-size:13px; color:var(--sub); margin:6px 0; }
+  .meta b { color:var(--ink); font-weight:600; }
+  .chaps { font-size:13px; max-height:132px; overflow:auto; border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin:8px 0; background:#fafafa; }
+  .chaps div { padding:2px 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .chaps .cn { color:var(--sub); margin-left:6px; }
+  .warn { background:var(--warnbg); color:var(--warn); border-radius:8px; padding:8px 10px; font-size:13px; margin:8px 0; }
+  .warn .chars { font-family:ui-monospace,monospace; word-break:break-all; }
+  .err { color:var(--err); font-size:13px; margin:8px 0; }
+  .btns { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+  button { border:0; border-radius:8px; padding:9px 16px; font-size:14px; cursor:pointer; }
+  button.dl { background:var(--accent); color:#fff; }
+  button.sec { background:#e5e7eb; color:var(--ink); }
+  button:disabled { opacity:.5; cursor:default; }
+  .fn { font-family:ui-monospace,monospace; font-size:12px; color:var(--sub); }
+  details { margin-top:8px; } summary { cursor:pointer; color:var(--accent); font-size:13px; }
+  .steps { font-size:13px; color:var(--sub); } .steps li { margin:4px 0; }
+  .priv { font-size:12px; color:var(--sub); text-align:center; margin-top:24px; }
+  code { background:#eef2f7; border-radius:4px; padding:1px 5px; font-size:12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Tạo file <span class="fn">.book</span></h1>
+  <p class="lead">Chuyển TXT / Aozora Bunko / EPUB sang định dạng của máy đọc sách tiếng Nhật. Mọi xử lý diễn ra ngay trong trình duyệt — tệp không rời khỏi máy bạn.</p>
+
+  <div class="card">
+    <div id="drop" class="drop">
+      <b>Kéo thả</b> tệp vào đây, hoặc <b>bấm để chọn</b><br>
+      <span class="hint">Hỗ trợ nhiều tệp .txt / .epub cùng lúc</span>
+    </div>
+    <input id="file" type="file" accept=".txt,.epub" multiple hidden>
+  </div>
+
+  <div id="out"></div>
+
+  <div class="card">
+    <details>
+      <summary>Cách đưa lên máy & đăng trang web này lên GitHub Pages</summary>
+      <p class="meta" style="margin-top:10px"><b>Đưa sách vào máy:</b></p>
+      <ol class="steps">
+        <li>Tải file <span class="fn">.book</span> ở trên về điện thoại/máy tính.</li>
+        <li>Trên máy đọc: mở menu (giữ nút trên cùng) → chọn <b>WiFi転送</b>.</li>
+        <li>Vào WiFi tên <span class="fn">Reader-XXXX</span> (mật khẩu hiện trên màn hình).</li>
+        <li>Mở trình duyệt, vào <code>http://192.168.4.1</code>, kéo thả file <span class="fn">.book</span> để tải lên.</li>
+        <li>Giữ nút「戻る」trên máy để tắt WiFi. Sách xuất hiện trong 本棚 (thư viện).</li>
+      </ol>
+      <p class="meta"><b>Đăng trang này lên GitHub Pages:</b></p>
+      <ol class="steps">
+        <li>Tạo repo mới trên github.com.</li>
+        <li><b>Add file → Upload files</b>, kéo cả thư mục <span class="fn">web/</span> (index.html, converter.js, entities.js, glyphs.js) vào, Commit.</li>
+        <li><b>Settings → Pages</b> → Source: <i>Deploy from a branch</i>, chọn nhánh <span class="fn">main</span> / thư mục <span class="fn">/ (root)</span>, Save.</li>
+        <li>Đợi ~1 phút rồi mở đường link GitHub cấp.</li>
+      </ol>
+    </details>
+  </div>
+
+  <p class="priv">Trang tĩnh, không gửi dữ liệu, không theo dõi. Cần trình duyệt hiện đại (Chrome/Edge/Safari/Firefox mới).</p>
+</div>
+
+<script src="entities.js"></script>
+<script src="glyphs.js"></script>
+<script src="converter.js"></script>
+<script>
+(function () {
+  'use strict';
+  var container = document.getElementById('out');
+  var drop = document.getElementById('drop'), file = document.getElementById('file');
+
+  if (!window.DecompressionStream) {
+    alert('Trình duyệt quá cũ, không hỗ trợ giải nén EPUB. Hãy cập nhật trình duyệt.');
+  }
+
+  // Tên file an toan cho máy (safeName của firmware: chỉ [0-9A-Za-z._-], max 48, bắt buộc .book)
+  function safeFileName(title, fallback) {
+    var base = (title || '').normalize ? title.normalize('NFKD') : title;
+    var s = '';
+    for (var i = 0; i < base.length; i++) {
+      var c = base[i], o = base.charCodeAt(i);
+      if (c === '.' || c === '-' || c === '_' ||
+          (o >= 48 && o <= 57) || (o >= 65 && o <= 90) || (o >= 97 && o <= 122)) s += c;
+      else if (c === ' ') s += '_';
+    }
+    s = s.replace(/_+/g, '_').replace(/^[._]+|[._]+$/g, '');
+    if (!s) s = fallback;
+    if (s.length > 43) s = s.slice(0, 43);   // +".book" = 48
+    return s + '.book';
+  }
+
+  function rand4() { return Math.random().toString(36).slice(2, 6); }
+
+  function scanUnsupported(chapters) {
+    var bad = {}, n = 0;
+    var glyphs = window.ReaderGlyphs;
+    if (!glyphs) return { list: [], count: 0 };
+    function check(s) {
+      for (var ch of s) {               // lặp theo code point
+        var cp = ch.codePointAt(0);
+        if (cp === 0x0A || cp === 0xFFFF) continue;
+        if (!glyphs.has(cp) && !bad[ch]) { bad[ch] = true; n++; }
+      }
+    }
+    for (var c = 0; c < chapters.length && n <= 60; c++) { check(chapters[c].name); check(chapters[c].text); }
+    return { list: Object.keys(bad), count: n };
+  }
+
+  function render(item) {
+    var el = document.createElement('div');
+    el.className = 'book';
+    var chapHtml = item.chapters.map(function (c) {
+      return '<div>' + esc(c.name) + '<span class="cn">（' + BookConverter.cpLen(c.text) + '字）</span></div>';
+    }).join('');
+    var totalChars = item.chapters.reduce(function (a, c) { return a + BookConverter.cpLen(c.text); }, 0);
+    var kindLabel = { epub: 'EPUB', aozora: 'Aozora Bunko', txt: 'Văn bản thường' }[item.kind] || item.kind;
+
+    el.innerHTML =
+      '<h3>' + esc(item.fileName) + '</h3>' +
+      '<div class="row"><label>Tiêu đề</label><input type="text" class="title"></div>' +
+      '<div class="row"><label>Hướng đọc</label><select class="orient">' +
+        '<option value="v">Dọc 縦書き (mặc định)</option><option value="h">Ngang 横書き</option></select></div>' +
+      '<div class="meta">Định dạng: <b>' + kindLabel + '</b> · Mã hoá: <b>' + esc(item.encoding) + '</b> · ' +
+        '<b>' + item.chapters.length + '</b> chương · <b>' + totalChars.toLocaleString() + '</b> ký tự</div>' +
+      (item.lossy ? '<div class="warn">⚠ Không nhận dạng được mã hoá; tệp có thể bị lỗi vài ký tự.</div>' : '') +
+      '<div class="chaps">' + chapHtml + '</div>' +
+      '<div class="warnslot"></div>' +
+      '<div class="btns"><button class="dl">Tải .book</button>' +
+        '<span class="fn fnlabel"></span></div>';
+
+    var titleInput = el.querySelector('.title');
+    var orient = el.querySelector('.orient');
+    var fnLabel = el.querySelector('.fnlabel');
+    var dlBtn = el.querySelector('.dl');
+    titleInput.value = item.defaultTitle;
+
+    function updateName() { fnLabel.textContent = '→ ' + safeFileName(titleInput.value, item.fallback); }
+    titleInput.addEventListener('input', updateName);
+    updateName();
+
+    var warn = scanUnsupported(item.chapters);
+    if (warn.count) {
+      el.querySelector('.warnslot').innerHTML =
+        '<div class="warn">⚠ ' + warn.count + ' ký tự không có trong phông của máy (sẽ hiển thị 〓): ' +
+        '<span class="chars">' + esc(warn.list.slice(0, 40).join(' ')) + (warn.count > 40 ? ' …' : '') + '</span></div>';
+    }
+
+    dlBtn.addEventListener('click', function () {
+      var title = titleInput.value || item.defaultTitle;
+      var bytes = BookConverter.buildBook(title, item.chapters, orient.value === 'v');
+      var blob = new Blob([bytes], { type: 'application/octet-stream' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = safeFileName(title, item.fallback);
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    });
+
+    container.appendChild(el);
+  }
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function fail(fileName, msg) {
+    var el = document.createElement('div');
+    el.className = 'book';
+    el.innerHTML = '<h3>' + esc(fileName) + '</h3><div class="err">✗ ' + esc(msg) + '</div>';
+    container.appendChild(el);
+  }
+
+  async function handle(files) {
+    var arr = [].slice.call(files).filter(function (f) { return /\.(txt|epub)$/i.test(f.name); });
+    if (!arr.length) { alert('Hãy chọn tệp .txt hoặc .epub'); return; }
+    for (var i = 0; i < arr.length; i++) {
+      var f = arr[i];
+      try {
+        var bytes = new Uint8Array(await f.arrayBuffer());
+        var r = await BookConverter.parse(f.name, bytes);
+        r.fileName = f.name;
+        r.fallback = 'book-' + rand4();
+        render(r);
+      } catch (e) {
+        fail(f.name, (e && e.message) || String(e));
+      }
+    }
+  }
+
+  drop.addEventListener('click', function () { file.click(); });
+  file.addEventListener('change', function () { handle(file.files); file.value = ''; });
+  ['dragenter', 'dragover'].forEach(function (e) { drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.add('hover'); }); });
+  ['dragleave', 'drop'].forEach(function (e) { drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.remove('hover'); }); });
+  drop.addEventListener('drop', function (ev) { handle(ev.dataTransfer.files); });
+})();
+</script>
+</body>
+</html>
